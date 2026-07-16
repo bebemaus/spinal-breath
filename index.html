@@ -23,12 +23,39 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            position: relative;
         }
 
         .container {
             text-align: center;
             padding: 20px;
             max-width: 400px;
+        }
+
+        /* Кнопка вимкнення фонової музики у твоєму золотому стилі */
+        .mute-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(162, 132, 74, 0.3);
+            color: #a2844a;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .mute-btn:hover {
+            border-color: #a2844a;
+            background: rgba(234, 122, 122, 0.1);
+            box-shadow: 0 0 15px rgba(234, 171, 122, 0.2);
         }
 
         /* Налаштування блоків меню */
@@ -120,6 +147,8 @@
 </head>
 <body>
 
+<button id="muteBtn" class="mute-btn" onclick="toggleMute()">🔔</button>
+
 <div class="container">
     <div class="menu-section">
         <div class="menu-label">Breathe techniques</div>
@@ -153,6 +182,7 @@
 
 <script>
     let isPlaying = false;
+    let isMuted = false; // Звук увімкнений за замовчуванням
     let mainIntervalId; // Головний єдиний інтервал для всього
     
     let currentTechnique = "spinal";
@@ -162,17 +192,17 @@
     const techniques = {
         spinal: [
             { state: "Take a deep breath 🪷", duration: 5, action: "inhale" },
-            { state: "Slowly🌬️exhale", duration: 5, action: "exhale" }
+            { state: "Slowly exhale 🌬️", duration: 5, action: "exhale" }
         ],
         box: [
-            { state: "Inhale🪷", duration: 4, action: "inhale" },
-            { state: "Hold🫧", duration: 4, action: "hold" },
-            { state: "Exhale🌬️", duration: 4, action: "exhale" },
-            { state: "Hold🫧", duration: 4, action: "hold" }
+            { state: "Inhale 🪷", duration: 4, action: "inhale" },
+            { state: "Hold 🫧", duration: 4, action: "hold" },
+            { state: "Exhale 🌬️", duration: 4, action: "exhale" },
+            { state: "Hold 🫧", duration: 4, action: "hold" }
         ],
         pranayama: [
-            { state: "Inhale🪷", duration: 4, action: "inhale" },
-            { state: "Hold🫧", duration: 7, action: "hold" },
+            { state: "Inhale 🪷", duration: 4, action: "inhale" },
+            { state: "Hold 🫧", duration: 7, action: "hold" },
             { state: "Exhale 🌬️", duration: 8, action: "exhale" }
         ]
     };
@@ -186,6 +216,7 @@
     const ambientSound = document.getElementById("ambientSound");
     const gongSound = document.getElementById("gongSound");
     const startBtn = document.getElementById("startBtn");
+    const muteBtn = document.getElementById("muteBtn");
 
     function selectTechnique(tech) {
         if (isPlaying) return;
@@ -222,25 +253,37 @@
         }
     }
 
+    function toggleMute() {
+        isMuted = !isMuted;
+        ambientSound.muted = isMuted; // Вимикаємо тільки фонову музику
+        
+        if (isMuted) {
+            muteBtn.innerText = "🔕";
+        } else {
+            muteBtn.innerText = "🔔";
+        }
+    }
+
     function startMeditation() {
         isPlaying = true;
-        startBtn.innerText = "Стоп";
+        startBtn.innerText = "Stop";
         totalSecondsLeft = selectedMinutes * 60;
         currentStepIndex = 0;
 
         updateTimerDisplay();
 
-        // 1. Звук ГОНГУ на початку сесії 🔔
+        // 1. Звук ГОНГУ на початку сесії (завжди активний) 🔔
         gongSound.currentTime = 0;
         gongSound.play().catch(e => console.log("Чекаємо на клік"));
 
-        // 2. Вмикаємо фонову музику 🎶
+        // 2. Вмикаємо фонову музику із врахуванням Mute 🎶
+        ambientSound.muted = isMuted;
         ambientSound.currentTime = 0;
         ambientSound.play().catch(e => console.log("Чекаємо на клік"));
 
         startNextStep();
         
-        // Запускаємо один стабільний інтервал, який рахує кожну секунду
+        // Запускаємо головний лічильник
         mainIntervalId = setInterval(tick, 1000);
     }
 
@@ -256,11 +299,12 @@
 
         if (isFinished) {
             statusText.innerText = "Practice is over ✨ Namaste";
-            // Звук ГОНГУ в кінці сесії 🔔
+            // Звук ГОНГУ в кінці сесії (завжди активний) 🔔
             gongSound.currentTime = 0;
-            gongSound.play();
+            gongSound.play().catch(e => console.log("Помилка відтворення гонгу"));
         } else {
-            statusText.innerText = "Meditation is stop";
+            const names = { spinal: "Spinal Breathing", box: "Box Breathing", pranayama: "Pranayama 4-7-8" };
+            statusText.innerText = names[currentTechnique];
         }
         
         totalSecondsLeft = selectedMinutes * 60;
@@ -281,24 +325,19 @@
         } else if (currentStep.action === "exhale") {
             breathingCircle.style.transform = "scale(1.0)";
         }
-        // якщо "hold", то коло просто фіксується в поточному стані
     }
 
     function tick() {
-        // Зменшуємо загальний час таймера
         totalSecondsLeft--;
         updateTimerDisplay();
 
-        // Зменшуємо час поточного кроку дихання
         timeLeftInStep--;
 
-        // Перевірка: чи закінчився загальний час медитації
         if (totalSecondsLeft <= 0) {
             stopMeditation(true);
             return;
         }
 
-        // Перевірка: чи пора міняти фазу дихання (вдих/видих/затримка)
         if (timeLeftInStep <= 0) {
             const steps = techniques[currentTechnique];
             currentStepIndex = (currentStepIndex + 1) % steps.length;
