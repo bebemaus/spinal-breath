@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spinal Breath</title>
+    <title>Pranayama & Spinal Breath</title>
     <style>
-        /* Стильний темний фон з естетичною картинкою */
         body {
             background-color: #121214;
-            /* Напівпрозоре темне "скло" поверх красивого лавандового пейзажу */
-            background-image: linear-gradient(rgba(18, 18, 20, 0.65), rgba(18, 18, 20, 0.9)), 
+            background-image: linear-gradient(rgba(18, 18, 20, 0.7), rgba(18, 18, 20, 0.95)), 
                               url('https://i.pinimg.com/1200x/03/4c/bc/034cbc3a0b7351bc50216064157d8778.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
             
-            color: #c6b890;
+            color: #E2E8F0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
@@ -30,115 +28,246 @@
         .container {
             text-align: center;
             padding: 20px;
+            max-width: 400px;
         }
 
-        /* Наше дихальне коло */
+        /* Налаштування блоків меню */
+        .menu-section {
+            margin-bottom: 15px;
+        }
+
+        .menu-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #a2844a;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .menu {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #A0AEC0;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn.active {
+            background: rgb(234 122 122 / 20%);
+            border-color: #634314;
+            color: #a2844a;
+            box-shadow: 0 0 40px rgb(234 171 122 / 30%);
+        }
+
+        /* Дихальне коло */
         .breathing-circle {
-            width: 150px;
-            height: 150px;
-            background: rgb(136 81 73 / 20%); 
-            border: 1px solid rgb(225 152 152 / 60%); /* Чіткий контур */
+            width: 120px;
+            height: 120px;
+            background: #a2844a45;
+            border: 2px solid rgb(234 194 122 / 20%);
             border-radius: 50%;
-            margin: 60px auto;
-            box-shadow: 0 0 40px rgba(181, 61, 34, 0.4);
-            
-            /* Плавний перехід зміни розміру триває рівно 5 секунд */
-            transition: transform 5s ease-in-out; 
-            transform: scale(1); /* Початковий стан */
+            margin: 70px auto;
+            box-shadow: 0 0 40px rgb(234 171 122 / 30%);
+            transition: transform 1s linear; 
+            transform: scale(1);
         }
 
         .status {
             font-size: 1.5rem;
             font-weight: 50;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             height: 40px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            color: #a2844a;
         }
 
         .timer {
-            font-size: 1.2rem;
+            font-size: 2rem;
             font-weight: 50;
-            color: #e4b3b37d
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            color: #a2844a;
+            margin-bottom: 20px;
         }
 
-        button {
+        .control-btn {
             background: transparent;
-            border: 1px solid #c6b890;
-            color: #c6b890;
-            padding: 12px 40px;
+            border: 1px solid #a2844a;
+            color: #a2844a;
+            padding: 12px 45px;
             font-size: 1rem;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
         }
 
-        button:hover {
-            background: #c6b890;
-            color: #121214;
-            box-shadow: 0 0 15px rgba(234, 150, 122, 0.5);
+        .control-btn:hover {
+            background: rgb(234 122 122 / 20%);
+            color: #d8b68b;
+            box-shadow: 0 0 40px rgb(234 171 122 / 30%);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="status" class="status">Натисни Старт для медитації</div>
-    <div id="timer" class="timer">0с</div>
+    <div class="menu-section">
+        <div class="menu-label">Breathe techniques</div>
+        <div class="menu">
+            <button id="btn-spinal" class="menu-btn active" onclick="selectTechnique('spinal')">Spinal (5/5)</button>
+            <button id="btn-box" class="menu-btn" onclick="selectTechnique('box')">Box (4/4)</button>
+            <button id="btn-pranayama" class="menu-btn" onclick="selectTechnique('pranayama')">4-7-8</button>
+        </div>
+    </div>
+
+    <div class="menu-section">
+        <div class="menu-label">Duration</div>
+        <div class="menu">
+            <button id="time-5" class="menu-btn active" onclick="selectDuration(5)">5 min</button>
+            <button id="time-10" class="menu-btn" onclick="selectDuration(10)">10 min</button>
+            <button id="time-15" class="menu-btn" onclick="selectDuration(15)">15 min</button>
+        </div>
+    </div>
+
+    <div id="status" class="status">Spinal Breathing</div>
+    
+    <div id="timer" class="timer">05:00</div>
 
     <div id="breathingCircle" class="breathing-circle"></div>
 
-    <button id="startBtn" onclick="toggleMeditation()">Старт</button>
+    <button id="startBtn" class="control-btn" onclick="toggleMeditation()">Start</button>
 </div>
 
-<audio id="bellSound" src="breath_sound.mp3" preload="auto" loop></audio>
+<audio id="ambientSound" src="breath_sound.mp3" preload="auto" loop></audio>
+<audio id="gongSound" src="gong.mp3" preload="auto"></audio>
 
 <script>
     let isPlaying = false;
-    let intervalId;
-    let state = "inhale"; // Початковий стан: inhale (вдих)
-    let seconds = 0;
+    let mainIntervalId; // Головний єдиний інтервал для всього
+    
+    let currentTechnique = "spinal";
+    let selectedMinutes = 5; // Час за замовчуванням
+    let totalSecondsLeft = 300; // 5 хвилин у секундах
+
+    const techniques = {
+        spinal: [
+            { state: "Take a deep breath 🪷", duration: 5, action: "inhale" },
+            { state: "Slowly🌬️exhale", duration: 5, action: "exhale" }
+        ],
+        box: [
+            { state: "Inhale🪷", duration: 4, action: "inhale" },
+            { state: "Hold🫧", duration: 4, action: "hold" },
+            { state: "Exhale🌬️", duration: 4, action: "exhale" },
+            { state: "Hold🫧", duration: 4, action: "hold" }
+        ],
+        pranayama: [
+            { state: "Inhale🪷", duration: 4, action: "inhale" },
+            { state: "Hold🫧", duration: 7, action: "hold" },
+            { state: "Exhale 🌬️", duration: 8, action: "exhale" }
+        ]
+    };
+
+    let currentStepIndex = 0;
+    let timeLeftInStep = 0;
 
     const statusText = document.getElementById("status");
     const timerText = document.getElementById("timer");
     const breathingCircle = document.getElementById("breathingCircle");
-    const bellSound = document.getElementById("bellSound");
+    const ambientSound = document.getElementById("ambientSound");
+    const gongSound = document.getElementById("gongSound");
     const startBtn = document.getElementById("startBtn");
+
+    function selectTechnique(tech) {
+        if (isPlaying) return;
+        currentTechnique = tech;
+        document.querySelectorAll(".menu-section:nth-child(1) .menu-btn").forEach(btn => btn.classList.remove("active"));
+        document.getElementById(`btn-${tech}`).classList.add("active");
+        
+        const names = { spinal: "Spinal Breathing", box: "Box Breathing", pranayama: "Pranayama 4-7-8" };
+        statusText.innerText = names[tech];
+    }
+
+    function selectDuration(mins) {
+        if (isPlaying) return;
+        selectedMinutes = mins;
+        totalSecondsLeft = mins * 60;
+        
+        document.querySelectorAll(".menu-section:nth-child(2) .menu-btn").forEach(btn => btn.classList.remove("active"));
+        document.getElementById(`time-${mins}`).classList.add("active");
+        
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        let minutes = Math.floor(totalSecondsLeft / 60);
+        let seconds = totalSecondsLeft % 60;
+        timerText.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 
     function toggleMeditation() {
         if (isPlaying) {
-            // --- ЦЕ БЛОК ВИМКНЕННЯ (Коли ти натискаєш СТОП) ---
-            clearInterval(timerId);
-            isPlaying = false;
-            startBtn.innerText = "Старт";
-            statusText.innerText = "Медитацію зупинено";
-            subStatusText.innerText = "Ready to start again";
-            timerText.innerText = "0с";
-            breathingCircle.style.transform = "scale(1)";
-            
-            // ВИМИКАЄМО МУЗИКУ тут 🛑
-            bellSound.pause();
-            bellSound.currentTime = 0; // скидаємо на початок треку
+            stopMeditation(false); // Зупинено вручну користувачем
         } else {
-            // --- ЦЕ БЛОК ЗАПУСКУ (Коли ти натискаєш СТАРТ) ---
-            isPlaying = true;
-            startBtn.innerText = "Стоп";
-            totalSeconds = 0;
-            currentStepIndex = 0;
-            
-            // ВМИКАЄМО МУЗИКУ тут і вона грає весь час 🎶
-            bellSound.play().catch(e => console.log("Чекаємо на перший клік для звуку"));
-            
-            startNextStep();
-            timerId = setInterval(updateTimer, 1000);
+            startMeditation();
         }
     }
-    
-    function runBreathingCycle() {
+
+    function startMeditation() {
+        isPlaying = true;
+        startBtn.innerText = "Стоп";
+        totalSecondsLeft = selectedMinutes * 60;
+        currentStepIndex = 0;
+
+        updateTimerDisplay();
+
+        // 1. Звук ГОНГУ на початку сесії 🔔
+        gongSound.currentTime = 0;
+        gongSound.play().catch(e => console.log("Чекаємо на клік"));
+
+        // 2. Вмикаємо фонову музику 🎶
+        ambientSound.currentTime = 0;
+        ambientSound.play().catch(e => console.log("Чекаємо на клік"));
+
+        startNextStep();
+        
+        // Запускаємо один стабільний інтервал, який рахує кожну секунду
+        mainIntervalId = setInterval(tick, 1000);
+    }
+
+    function stopMeditation(isFinished) {
+        clearInterval(mainIntervalId);
+        isPlaying = false;
+        startBtn.innerText = "Start";
+        breathingCircle.style.transform = "scale(1)";
+        
+        // Зупиняємо фоновий ембієнт
+        ambientSound.pause();
+        ambientSound.currentTime = 0;
+
+        if (isFinished) {
+            statusText.innerText = "Practice is over ✨ Namaste";
+            // Звук ГОНГУ в кінці сесії 🔔
+            gongSound.currentTime = 0;
+            gongSound.play();
+        } else {
+            statusText.innerText = "Meditation is stop";
+        }
+        
+        totalSecondsLeft = selectedMinutes * 60;
+        updateTimerDisplay();
+    }
+
+    function startNextStep() {
         const steps = techniques[currentTechnique];
         const currentStep = steps[currentStepIndex];
         
@@ -148,21 +277,32 @@
         breathingCircle.style.transition = `transform ${currentStep.duration}s linear`;
 
         if (currentStep.action === "inhale") {
-            breathingCircle.style.transform = "scale(1.7)"; 
+            breathingCircle.style.transform = "scale(1.7)";
         } else if (currentStep.action === "exhale") {
-            breathingCircle.style.transform = "scale(1.0)"; 
+            breathingCircle.style.transform = "scale(1.0)";
         }
-        // Ніяких запусків звуку тут! Музика просто спокійно грає на фоні.
+        // якщо "hold", то коло просто фіксується в поточному стані
     }
 
-    function updateTimer() {
-        seconds++;
-        timerText.innerText = seconds + "с";
+    function tick() {
+        // Зменшуємо загальний час таймера
+        totalSecondsLeft--;
+        updateTimerDisplay();
 
-        // Кожні 5 секунд міняємо фазу дихання (Spinal breath 5/5)
-        if (seconds % 5 === 0) {
-            state = (state === "inhale") ? "exhale" : "inhale";
-            runBreathingCycle();
+        // Зменшуємо час поточного кроку дихання
+        timeLeftInStep--;
+
+        // Перевірка: чи закінчився загальний час медитації
+        if (totalSecondsLeft <= 0) {
+            stopMeditation(true);
+            return;
+        }
+
+        // Перевірка: чи пора міняти фазу дихання (вдих/видих/затримка)
+        if (timeLeftInStep <= 0) {
+            const steps = techniques[currentTechnique];
+            currentStepIndex = (currentStepIndex + 1) % steps.length;
+            startNextStep();
         }
     }
 </script>
