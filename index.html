@@ -111,46 +111,48 @@
 
     function toggleMeditation() {
         if (isPlaying) {
-            // Зупинка та скидання всього на початкові значення
-            clearInterval(intervalId);
+            // --- ЦЕ БЛОК ВИМКНЕННЯ (Коли ти натискаєш СТОП) ---
+            clearInterval(timerId);
             isPlaying = false;
             startBtn.innerText = "Старт";
             statusText.innerText = "Медитацію зупинено";
+            subStatusText.innerText = "Ready to start again";
             timerText.innerText = "0с";
-            breathingCircle.style.transform = "scale(1)"; // Коло повертається до звичайного розміру
-            // Зупиняємо музику і скидаємо її на початок
+            breathingCircle.style.transform = "scale(1)";
+            
+            // ВИМИКАЄМО МУЗИКУ тут 🛑
             bellSound.pause();
-            bellSound.currentTime = 0;
+            bellSound.currentTime = 0; // скидаємо на початок треку
         } else {
-            // Старт
+            // --- ЦЕ БЛОК ЗАПУСКУ (Коли ти натискаєш СТАРТ) ---
             isPlaying = true;
             startBtn.innerText = "Стоп";
             totalSeconds = 0;
             currentStepIndex = 0;
             
-            // Запускаємо фоновий ембієнт
-            bellSound.play().catch(e => console.log("Музика запрацює після кліку"));
+            // ВМИКАЄМО МУЗИКУ тут і вона грає весь час 🎶
+            bellSound.play().catch(e => console.log("Чекаємо на перший клік для звуку"));
             
             startNextStep();
             timerId = setInterval(updateTimer, 1000);
         }
     }
-
+    
     function runBreathingCycle() {
-        if (state === "inhale") {
-            statusText.innerText = "Глибокий вдих 🪷";
-            breathingCircle.style.transform = "scale(1.8)"; // Плавно збільшуємо коло в 1.8 рази
-            
-            // Намагаємося відтворити звук (і обходимо блокування браузера)
-            bellSound.currentTime = 0;
-            bellSound.play().catch(e => console.log("Чекаємо на клік для звуку"));
-        } else {
-            statusText.innerText = "Видих🌬️відпускай все";
-            breathingCircle.style.transform = "scale(1)"; // Плавно зменшуємо коло до норми
-            
-            bellSound.currentTime = 0;
-            bellSound.play().catch(e => console.log("Чекаємо на клік для звуку"));
+        const steps = techniques[currentTechnique];
+        const currentStep = steps[currentStepIndex];
+        
+        timeLeftInStep = currentStep.duration;
+        statusText.innerText = currentStep.state;
+
+        breathingCircle.style.transition = `transform ${currentStep.duration}s linear`;
+
+        if (currentStep.action === "inhale") {
+            breathingCircle.style.transform = "scale(1.7)"; 
+        } else if (currentStep.action === "exhale") {
+            breathingCircle.style.transform = "scale(1.0)"; 
         }
+        // Ніяких запусків звуку тут! Музика просто спокійно грає на фоні.
     }
 
     function updateTimer() {
