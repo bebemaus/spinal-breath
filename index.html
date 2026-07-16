@@ -118,14 +118,21 @@
             statusText.innerText = "Медитацію зупинено";
             timerText.innerText = "0с";
             breathingCircle.style.transform = "scale(1)"; // Коло повертається до звичайного розміру
+            // Зупиняємо музику і скидаємо її на початок
+            bellSound.pause();
+            bellSound.currentTime = 0;
         } else {
-            // Запуск програми
+            // Старт
             isPlaying = true;
             startBtn.innerText = "Стоп";
-            seconds = 0;
-            state = "inhale";
-            runBreathingCycle();
-            intervalId = setInterval(updateTimer, 1000);
+            totalSeconds = 0;
+            currentStepIndex = 0;
+            
+            // Запускаємо фоновий ембієнт
+            bellSound.play().catch(e => console.log("Музика запрацює після кліку"));
+            
+            startNextStep();
+            timerId = setInterval(updateTimer, 1000);
         }
     }
 
