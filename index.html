@@ -1,1 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spinal Breath</title>
+    <style>
+        /* Стильний темний фон з естетичною картинкою */
+        body {
+            background-color: #121214;
+            /* Напівпрозоре темне "скло" поверх красивого лавандового пейзажу */
+            background-image: linear-gradient(rgba(18, 18, 20, 0.65), rgba(18, 18, 20, 0.9)), 
+                              url('https://i.pinimg.com/1200x/03/4c/bc/034cbc3a0b7351bc50216064157d8778.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            
+            color: #c6b890;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
 
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Наше дихальне коло */
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            background: rgb(136 81 73 / 20%); 
+            border: 1px solid rgb(225 152 152 / 60%); /* Чіткий контур */
+            border-radius: 50%;
+            margin: 60px auto;
+            box-shadow: 0 0 40px rgba(181, 61, 34, 0.4);
+            
+            /* Плавний перехід зміни розміру триває рівно 5 секунд */
+            transition: transform 5s ease-in-out; 
+            transform: scale(1); /* Початковий стан */
+        }
+
+        .status {
+            font-size: 1.5rem;
+            font-weight: 50;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            height: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: 50;
+            color: #e4b3b37d
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid #c6b890;
+            color: #c6b890;
+            padding: 12px 40px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #c6b890;
+            color: #121214;
+            box-shadow: 0 0 15px rgba(234, 150, 122, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="status" class="status">Натисни Старт для медитації</div>
+    <div id="timer" class="timer">0с</div>
+
+    <div id="breathingCircle" class="breathing-circle"></div>
+
+    <button id="startBtn" onclick="toggleMeditation()">Старт</button>
+</div>
+
+<audio id="bellSound" src="breath_sound.mp3" preload="auto" loop></audio>
+
+<script>
+    let isPlaying = false;
+    let intervalId;
+    let state = "inhale"; // Початковий стан: inhale (вдих)
+    let seconds = 0;
+
+    const statusText = document.getElementById("status");
+    const timerText = document.getElementById("timer");
+    const breathingCircle = document.getElementById("breathingCircle");
+    const bellSound = document.getElementById("bellSound");
+    const startBtn = document.getElementById("startBtn");
+
+    function toggleMeditation() {
+        if (isPlaying) {
+            // Зупинка та скидання всього на початкові значення
+            clearInterval(intervalId);
+            isPlaying = false;
+            startBtn.innerText = "Старт";
+            statusText.innerText = "Медитацію зупинено";
+            timerText.innerText = "0с";
+            breathingCircle.style.transform = "scale(1)"; // Коло повертається до звичайного розміру
+        } else {
+            // Запуск програми
+            isPlaying = true;
+            startBtn.innerText = "Стоп";
+            seconds = 0;
+            state = "inhale";
+            runBreathingCycle();
+            intervalId = setInterval(updateTimer, 1000);
+        }
+    }
+
+    function runBreathingCycle() {
+        if (state === "inhale") {
+            statusText.innerText = "Глибокий вдих 🪷";
+            breathingCircle.style.transform = "scale(1.8)"; // Плавно збільшуємо коло в 1.8 рази
+            
+            // Намагаємося відтворити звук (і обходимо блокування браузера)
+            bellSound.currentTime = 0;
+            bellSound.play().catch(e => console.log("Чекаємо на клік для звуку"));
+        } else {
+            statusText.innerText = "Видих🌬️відпускай все";
+            breathingCircle.style.transform = "scale(1)"; // Плавно зменшуємо коло до норми
+            
+            bellSound.currentTime = 0;
+            bellSound.play().catch(e => console.log("Чекаємо на клік для звуку"));
+        }
+    }
+
+    function updateTimer() {
+        seconds++;
+        timerText.innerText = seconds + "с";
+
+        // Кожні 5 секунд міняємо фазу дихання (Spinal breath 5/5)
+        if (seconds % 5 === 0) {
+            state = (state === "inhale") ? "exhale" : "inhale";
+            runBreathingCycle();
+        }
+    }
+</script>
+
+</body>
+</html>
